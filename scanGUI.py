@@ -4,6 +4,7 @@ import winsound
 import tkinter as tk
 from tkinter import simpledialog
 from threading import Thread, Event
+import configparser
 
 camera = 0
 color = 90  # 0-255 Gray is mostly 3 times the same Color Value like 90,90,90
@@ -70,6 +71,58 @@ def scan_image_with_line_and_draw(image, _scan_line_length, _target_color, _tole
     cv2.line(image, (x_start-20, _start_of_scan), (x_end+20, _start_of_scan), (0, 0, 0), 5)
     cv2.line(image, (x_start-20, _end_of_scan), (x_end+20, _end_of_scan), (0, 0, 0), 5)
 
+def save_variables_to_ini():
+    """Save the current variables to an INI file."""
+    config = configparser.ConfigParser()
+    
+    # Section for variables
+    config['Variables'] = {
+        'camera': camera,
+        'color': color,
+        'tolerance': tolerance,
+        'start_of_scan': start_of_scan,
+        'end_of_scan': end_of_scan,
+        'scan_line_length': scan_line_length,
+        'min_matches': min_matches,
+        'low_level_px': low_level_px,
+        'high_level_px': high_level_px,
+        'percent_alarm': percent_alarm
+    }
+    
+    # Write to an INI file
+    with open('settings.ini', 'w') as configfile:
+        config.write(configfile)
+
+def load_variables_from_ini():
+    """Load variables from an INI file."""
+    # Create a ConfigParser object
+    config = configparser.ConfigParser()
+    try:        
+        # Read the INI file
+        config.read('settings.ini')
+        global camera, color, target_color, tolerance, start_of_scan, end_of_scan, scan_line_length, min_matches, low_level_px, high_level_px, percent_alarm
+        camera = int(config['Variables']['camera'])
+        color = int(config['Variables']['color'])
+        tolerance = float(config['Variables']['tolerance'])
+        start_of_scan = int(config['Variables']['start_of_scan'])
+        end_of_scan = int(config['Variables']['end_of_scan'])
+        scan_line_length = int(config['Variables']['scan_line_length'])
+        min_matches = int(config['Variables']['min_matches'])
+        low_level_px = int(config['Variables']['low_level_px'])
+        high_level_px = int(config['Variables']['high_level_px'])
+        percent_alarm = int(config['Variables']['percent_alarm'])
+
+    except configparser.NoSectionError:
+        # Handle the case where the 'Variables' section is missing
+        print("Error: Section 'Variables' not found in the INI file.")
+    except configparser.Error as e:
+        # Handle other configparser errors
+        print(f"ConfigParser error: {e}")
+        variables = {}  # Consider setting default values here
+    except Exception as e:
+        # Handle unexpected errors
+        print(f"Unexpected error: {e}")
+
 # Function to update global variables
 def update_variables():
     global camera, color, target_color, tolerance, start_of_scan, end_of_scan, scan_line_length, min_matches, low_level_px, high_level_px, percent_alarm
@@ -84,6 +137,7 @@ def update_variables():
     low_level_px = int(low_level_px_var.get())
     high_level_px = int(high_level_px_var.get())
     percent_alarm = int(percent_alarm_var.get())
+    save_variables_to_ini()
 
 # Function that encapsulates your existing code for processing and displaying the video
 def process_video():
@@ -114,6 +168,10 @@ def start_video():
 
 def stop_video():
     stop_event.set()
+
+
+# Load variables and print them to verify
+load_variables_from_ini()
 
 # GUI setup
 root = tk.Tk()
