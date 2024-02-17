@@ -143,7 +143,7 @@ high_level_px_var = tk.StringVar(value=str(high_level_px))
 percent_alarm_var = tk.StringVar(value=str(percent_alarm))
 
 # GUI Layout
-labels_and_vars = [("Camera (ID)", camera_var), ("Color RGB", color_var), ("Tolerance (0.0-2.0)", tolerance_var), ("Start of Scan (Px)", start_of_scan_var), ("End of Scan (Px)", end_of_scan_var), ("Scan Line Length (Px)", scan_line_length_var), ("Min Matches", min_matches_var), ("Low Level (Px)", low_level_px_var), ("High Level (Px)", high_level_px_var), ("Percent Alarm", percent_alarm_var)]
+labels_and_vars = [("Camera (ID)", camera_var), ("Gray Lum (0-255)", color_var), ("Tolerance (0.0-2.0)", tolerance_var), ("Start of Scan (Px)", start_of_scan_var), ("End of Scan (Px)", end_of_scan_var), ("Scan Line Length (Px)", scan_line_length_var), ("Min Matches", min_matches_var), ("Low Level (Px)", low_level_px_var), ("High Level (Px)", high_level_px_var), ("Percent Alarm", percent_alarm_var)]
 
 
 # Dynamically add labels and entries based on labels_and_vars content
