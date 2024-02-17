@@ -12,7 +12,7 @@ scan_line_length = 40  # in px
 min_matches = 25
 low_level_px=248
 high_level_px=151
-percent_alarm = 20
+percent_alarm = 120
 
 def translate(value, leftMin, leftMax, rightMin, rightMax):
     leftSpan = leftMax - leftMin
@@ -56,9 +56,9 @@ def scan_image_with_line_and_draw(image, _scan_line_length, _target_color, _tole
                 percent = 0
             if percent >= _percent_alarm:
                 cv2.putText(image, '!!!ALARM!!!', (center_x-150,center_y), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255) , 3, cv2.LINE_AA)
-                winsound.Beep(2500,1000)
+                winsound.Beep(2500,100)
                 break
-            cv2.putText(image, f"{percent} %", (x_end+10, y-_min_matches), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0) , 2, cv2.LINE_AA)
+            cv2.putText(image, f"{percent} %", (x_end+20, y-_min_matches+10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0) , 2, cv2.LINE_AA)
             break
 
     cv2.line(image, (x_start-20, _start_of_scan), (x_end+20, _start_of_scan), (0, 0, 0), 5)
