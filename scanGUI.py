@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import simpledialog
 from threading import Thread, Event
 import configparser
+from PIL import Image, ImageTk
 
 camera = 0
 color = 90  # 0-255 Gray is mostly 3 times the same Color Value like 90,90,90
@@ -140,7 +141,7 @@ def update_variables():
     save_variables_to_ini()
 
 # Function that encapsulates your existing code for processing and displaying the video
-def process_video():
+def process_video(root, image_label):
     global camera, target_color, tolerance, start_of_scan, end_of_scan, scan_line_length, min_matches, low_level_px, high_level_px, percent_alarm
     cap = cv2.VideoCapture(camera)
 
@@ -152,18 +153,26 @@ def process_video():
 
         scan_image_with_line_and_draw(frame, scan_line_length, target_color, tolerance, start_of_scan, end_of_scan, min_matches, low_level_px, high_level_px, percent_alarm)
 
-        cv2.imshow("Webcam - Color Match Indicator", frame)
+        # Convert the image to RGB (from BGR)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        # Convert the image to PIL format
+        img = Image.fromarray(frame)
+        # Convert the image for Tkinter
+        imgtk = ImageTk.PhotoImage(image=img)
+        # Update the image_label with the new image
+        image_label.configure(image=imgtk)
+        image_label.image = imgtk
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        # This replaces cv2.waitKey, tkinter doesn't need an explicit wait function for updates
+        root.update_idletasks()
+        root.update()
 
     cap.release()
-    cv2.destroyAllWindows()
 
 def start_video():
     stop_event.clear()
     update_variables()
-    video_thread = Thread(target=process_video, daemon=True)
+    video_thread = Thread(target=lambda: process_video(root, image_label), daemon=True)
     video_thread.start()
 
 def stop_video():
@@ -176,8 +185,8 @@ load_variables_from_ini()
 # GUI setup
 root = tk.Tk()
 root.title("Powder Level Alarm")
-root.geometry("265x285")
-root.resizable(False, False)
+root.geometry("657x795")
+#root.resizable(False, False)
 
 # Configure the grid to use all available space in columns
 root.grid_columnconfigure(0, weight=1)
@@ -212,5 +221,10 @@ for i, (label_text, var) in enumerate(labels_and_vars, start=2):  # Start at row
 # Start and Stop buttons
 tk.Button(root, text="Start", command=start_video).grid(row=len(labels_and_vars) + 3, column=0)
 tk.Button(root, text="Stop", command=stop_video).grid(row=len(labels_and_vars) + 3, column=1)
+
+# Create an image label to display the video
+image_label = tk.Label(root)
+image_label.grid(row=len(labels_and_vars) + 4, column=0, columnspan=2)  # Adjust grid positioning as needed
+
 
 root.mainloop()
